@@ -1,0 +1,89 @@
+syntax = "proto3";
+package proto;
+
+option go_package = "proto/";
+
+// Enum for order status
+enum OrderStatus {
+  PENDING = 0;
+  PROCESSING = 1;
+  SHIPPED = 2;
+  DELIVERED = 3;
+  CANCELED = 4;
+  RETURNED = 5;
+}
+// OrderItem message definition
+message OrderItem {
+  string product_id = 1;
+  int32 quantity = 2;
+  double price = 3;
+}
+// Order message definition
+message Order {
+  string customer_id = 1;
+  repeated OrderItem items = 2;
+//  double total_price = 3;
+  OrderStatus status = 3;
+}
+message Address {
+  string AddressLine1 = 1;
+  string AddressLine2 = 2;
+  string City = 3;
+  string State = 4;
+  string Country = 5;
+  string Zip = 6;
+}
+
+// Request and response messages
+// For creating a new order
+message CreateOrderRequest {
+  string customer_id = 1;
+  repeated OrderItem items = 2;
+  Address Address = 3;
+  string Phone = 4;
+}
+message CreateOrderResponse {
+  string Message = 1;
+  Order order = 2;
+  Address Address = 3;
+  string Phone = 4;
+}
+// For retrieving an order by ID
+message GetOrderRequest {
+  string order_id = 1;
+}
+message GetOrderResponse {
+  Order order = 1;
+  Address Address = 2;
+  string Phone = 3;
+}
+// For updating the status of an order
+message UpdateOrderStatusRequest {
+  string order_id = 1;
+  OrderStatus status = 2;
+}
+message UpdateOrderStatusResponse {
+  Order order = 1;
+}
+// For canceling an order
+message CancelOrderRequest {
+  string order_id = 1;
+}
+message CancelOrderResponse {
+  Order order = 1;
+}
+// For returning an order
+message ReturnOrderRequest {
+  string order_id = 1;
+}
+message ReturnOrderResponse {
+  Order order = 1;
+}
+// gRPC service definition
+service OrderService {
+  rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse);
+  rpc GetOrder(GetOrderRequest) returns (GetOrderResponse);
+  rpc UpdateOrderStatus(UpdateOrderStatusRequest) returns (UpdateOrderStatusResponse);
+  rpc CancelOrder(CancelOrderRequest) returns (CancelOrderResponse);
+  rpc ReturnOrder(ReturnOrderRequest) returns (ReturnOrderResponse);
+}
