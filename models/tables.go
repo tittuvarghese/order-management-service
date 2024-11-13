@@ -19,20 +19,20 @@ const (
 )
 
 // OrderItem model
-type OrderItem struct {
+type Item struct {
 	ID        uint    `gorm:"primaryKey" json:"id"`
-	ProductID string  `gorm:"type:string;not null" json:"product_id"`
+	ProductID string  `gorm:"type:string;not null;index" json:"product_id"`
 	Quantity  int32   `gorm:"not null" json:"quantity"`
 	Price     float64 `gorm:"not null" json:"price"`
-	OrderID   string  `gorm:"type:uuid;not null;index" json:"order_id"`
+	OrderID   string  `gorm:"type:string;not null;index" json:"order_id"`
 }
 
 // Order model
 type Order struct {
 	ID         uint        `gorm:"primaryKey" json:"id"`
-	OrderID    uuid.UUID   `gorm:"type:uuid;uniqueIndex" json:"order_id"`
+	OrderID    string      `gorm:"type:string;uniqueIndex" json:"order_id"`
 	CustomerID uuid.UUID   `gorm:"type:uuid;not null" json:"customer_id"`
-	Items      []OrderItem `gorm:"foreignKey:OrderID" json:"items"`
+	Items      []Item      `gorm:"foreignKey:OrderID" json:"items"`
 	Address    Address     `gorm:"foreignKey:OrderID" json:"address"`
 	TotalPrice float64     `gorm:"type:decimal(10,2);not null" json:"total_price"`
 	Phone      string      `json:"phone"`
@@ -43,7 +43,7 @@ type Order struct {
 
 type Address struct {
 	ID           uint   `gorm:"primaryKey" json:"id"`
-	OrderID      string `gorm:"type:uuid;uniqueIndex;not null" json:"order_id"`
+	OrderID      string `gorm:"type:string;uniqueIndex;not null" json:"order_id"`
 	AddressLine1 string `gorm:"type:string;not null" json:"address_line_1"`
 	AddressLine2 string `gorm:"type:string;not null" json:"address_line_2"`
 	City         string `gorm:"type:string;not null" json:"city"`
@@ -54,15 +54,15 @@ type Address struct {
 
 // BeforeCreate hook to set UUIDs before inserting a new record
 func (o *Order) BeforeCreate(tx *gorm.DB) (err error) {
-	if o.OrderID == uuid.Nil {
-		o.OrderID = uuid.New()
+	if o.OrderID == "" {
+		o.OrderID = uuid.New().String()
 	}
 
-	o.Address.OrderID = o.OrderID.String()
+	o.Address.OrderID = o.OrderID //.String()
 
 	for i := range o.Items {
 		if o.Items[i].ID == 0 {
-			o.Items[i].OrderID = o.OrderID.String()
+			o.Items[i].OrderID = o.OrderID //.String()
 		}
 	}
 	return

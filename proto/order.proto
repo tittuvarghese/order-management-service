@@ -20,10 +20,13 @@ message OrderItem {
 }
 // Order message definition
 message Order {
-  string customer_id = 1;
-  repeated OrderItem items = 2;
-//  double total_price = 3;
-  OrderStatus status = 3;
+  string order_id = 1;
+  string customer_id = 2;
+  repeated OrderItem items = 3;
+  double total_price = 4;
+  OrderStatus status = 5;
+  Address Address = 6;
+  string Phone = 7;
 }
 message Address {
   string AddressLine1 = 1;
@@ -44,9 +47,15 @@ message CreateOrderRequest {
 }
 message CreateOrderResponse {
   string Message = 1;
-  Order order = 2;
-  Address Address = 3;
-  string Phone = 4;
+  Order Order = 2;
+}
+// For retrieving all orders
+message GetOrdersRequest {
+  string customer_id = 1;
+}
+message GetOrdersResponse {
+  string Message = 1;
+  repeated  Order Orders = 2;
 }
 // For retrieving an order by ID
 message GetOrderRequest {
@@ -82,6 +91,7 @@ message ReturnOrderResponse {
 // gRPC service definition
 service OrderService {
   rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse);
+  rpc GetOrders(GetOrdersRequest) returns (GetOrdersResponse);
   rpc GetOrder(GetOrderRequest) returns (GetOrderResponse);
   rpc UpdateOrderStatus(UpdateOrderStatusRequest) returns (UpdateOrderStatusResponse);
   rpc CancelOrder(CancelOrderRequest) returns (CancelOrderResponse);

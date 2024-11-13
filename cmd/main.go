@@ -32,7 +32,7 @@ func main() {
 		log.Error("Error opening relational db", err)
 	}
 
-	err = dbInstance.Instance.AutoMigrate(models.Order{}, models.OrderItem{}, models.Address{})
+	err = dbInstance.Instance.AutoMigrate(models.Order{}, models.Item{}, models.Address{})
 	if err != nil {
 		log.Error("Error performing auto migration for db", err)
 	}
