@@ -29,16 +29,8 @@ func CreateOrder(order models.Order, storage *database.RelationalDatabase) error
 
 		var queryExpr = database.DbExpr
 		queryExpr.Column = "quantity"
-		queryExpr.Value = storage.Instance.BuildExpr("quantity - ?", item.Quantity) // gorm.Expr("quantity - ?", item.Quantity)
+		queryExpr.Value = storage.Instance.BuildExpr("quantity - ?", item.Quantity)
 		queryUpdate.Expr = queryExpr
-
-		//queryUpdate.Expr = tx.Expr{
-		//	Column: "quantity",
-		//	Value:  gorm.Expr("quantity - ?", item.Quantity),
-		//}
-		//var queryUpdate = database.DbOps
-		//queryUpdate.M
-
 		transaction.Operations = append(transaction.Operations, queryUpdate)
 	}
 
