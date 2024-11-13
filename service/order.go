@@ -1,7 +1,6 @@
 package service
 
 import (
-	tx "github.com/tittuvarghese/core/storage"
 	"github.com/tittuvarghese/order-management-service/core/database"
 	"github.com/tittuvarghese/order-management-service/models"
 )
@@ -12,10 +11,9 @@ func CreateOrder(order models.Order, storage *database.RelationalDatabase) error
 
 	// Building transaction
 	// 1. Order creation
-	orderCreation := tx.Operation{
-		Model:   &order,
-		Command: database.CreateCommand,
-	}
+	orderCreation := database.DbOps
+	orderCreation.Model = &order
+	orderCreation.Command = database.CreateCommand
 
 	transaction.Operations = append(transaction.Operations, orderCreation)
 
