@@ -1,23 +1,20 @@
 package service
 
 import (
-	"fmt"
 	tx "github.com/tittuvarghese/core/storage"
 	"github.com/tittuvarghese/order-management-service/core/database"
 	"github.com/tittuvarghese/order-management-service/models"
-	"gorm.io/gorm"
 )
 
 func CreateOrder(order models.Order, storage *database.RelationalDatabase) error {
 
-	// err := storage.Instance.Insert(&order)
-	var transaction tx.AtomicTransaction
+	var transaction = database.DbTxn
 
 	// Building transaction
 	// 1. Order creation
 	orderCreation := tx.Operation{
 		Model:   &order,
-		Command: tx.CreateCommand,
+		Command: database.CreateCommand,
 	}
 
 	transaction.Operations = append(transaction.Operations, orderCreation)
@@ -25,20 +22,28 @@ func CreateOrder(order models.Order, storage *database.RelationalDatabase) error
 	// Update Quantity
 	for _, item := range order.Items {
 		condition := map[string]interface{}{"id": item.ProductID}
-		qtyUpdate := tx.Operation{
-			Model:     &models.Product{},
-			Command:   tx.UpdateCommand,
-			Condition: condition,
-			Expr: tx.Expr{
-				Column: "quantity",
-				Value:  gorm.Expr("quantity - ?", item.Quantity),
-			},
-		}
-		transaction.Operations = append(transaction.Operations, qtyUpdate)
+		var queryUpdate = database.DbOps
+		queryUpdate.Model = &models.Product{}
+		queryUpdate.Condition = condition
+		queryUpdate.Command = database.UpdateCommand
+
+		var queryExpr = database.DbExpr
+		queryExpr.Column = "quantity"
+		queryExpr.Value = storage.Instance.BuildExpr("quantity - ?", item.Quantity) // gorm.Expr("quantity - ?", item.Quantity)
+		queryUpdate.Expr = queryExpr
+
+		//queryUpdate.Expr = tx.Expr{
+		//	Column: "quantity",
+		//	Value:  gorm.Expr("quantity - ?", item.Quantity),
+		//}
+		//var queryUpdate = database.DbOps
+		//queryUpdate.M
+
+		transaction.Operations = append(transaction.Operations, queryUpdate)
 	}
 
 	err := storage.Instance.Transaction(transaction)
-	fmt.Println(err)
+
 	if err != nil {
 		return err
 	}
