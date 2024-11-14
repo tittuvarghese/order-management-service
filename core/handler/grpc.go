@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"fmt"
 	"github.com/google/uuid"
 	"github.com/tittuvarghese/core/logger"
 	"github.com/tittuvarghese/order-management-service/core/database"
@@ -129,6 +130,52 @@ func (s *Server) GetOrders(ctx context.Context, req *proto.GetOrdersRequest) (*p
 	// Return the response with the list of orders
 	return &proto.GetOrdersResponse{
 		Orders: response,
+	}, nil
+}
+
+func (s *Server) GetOrder(ctx context.Context, req *proto.GetOrderRequest) (*proto.GetOrderResponse, error) {
+	// Parse the customer ID
+	buyerId, err := uuid.Parse(req.CustomerId)
+	if err != nil {
+		return &proto.GetOrderResponse{
+			Message: "Unable to parse buyer id",
+		}, err
+	}
+
+	// Get the orders for the customer
+	orderResult, err := service.GetOrder(buyerId, req.OrderId, s.RdbInstance)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(orderResult) <= 0 {
+		log.Error("no order found", nil)
+		return &proto.GetOrderResponse{
+			Message: "No order found",
+		}, fmt.Errorf("no order found")
+	}
+
+	order := orderResult[0]
+
+	// Iterate through orders and build the response
+	response := &proto.Order{
+		OrderId: order.OrderID,
+		Items:   GetItemsFromOrder(order.Items), // Get items from order
+		Address: &proto.Address{
+			AddressLine1: order.Address.AddressLine1,
+			AddressLine2: order.Address.AddressLine2,
+			City:         order.Address.City,
+			State:        order.Address.State,
+			Zip:          order.Address.Zip,
+			Country:      order.Address.Country,
+		},
+		Phone: order.Phone,
+	}
+
+	// Return the response with the list of orders
+	return &proto.GetOrderResponse{
+		Order:   response,
+		Message: "Successfully retrieved the order",
 	}, nil
 }
 

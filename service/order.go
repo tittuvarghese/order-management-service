@@ -60,8 +60,34 @@ func GetOrders(customerId uuid.UUID, storage *database.RelationalDatabase) (*[]m
 	}
 
 	foundOrder, _ := res[0].(*[]models.Order)
+
 	if len(*foundOrder) == 0 {
 		return nil, fmt.Errorf("no orders found")
 	}
 	return foundOrder, nil
+}
+
+func GetOrder(customerId uuid.UUID, orderId string, storage *database.RelationalDatabase) ([]models.Order, error) {
+	var orders []models.Order
+	condition := map[string]interface{}{"customer_id": customerId, "order_id": orderId}
+
+	tables := []string{"Items", "Address"}
+
+	// Query the database with the given condition
+	res, err := storage.Instance.QueryByCondition(&orders, condition, tables...)
+	if err != nil {
+		return []models.Order{}, err
+	}
+
+	// Check if the result contains any products
+	if len(res) <= 0 {
+		return []models.Order{}, fmt.Errorf("order not found")
+	}
+
+	foundOrder, ok := res[0].(*[]models.Order) // Type assertion to pointer of models.Product
+	if !ok {
+		return []models.Order{}, fmt.Errorf("type assertion failed")
+	}
+
+	return *foundOrder, nil
 }

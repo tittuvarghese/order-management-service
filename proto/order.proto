@@ -59,12 +59,12 @@ message GetOrdersResponse {
 }
 // For retrieving an order by ID
 message GetOrderRequest {
-  string order_id = 1;
+  string customer_id = 1;
+  string order_id = 2;
 }
 message GetOrderResponse {
-  Order order = 1;
-  Address Address = 2;
-  string Phone = 3;
+  string Message = 1;
+  Order order = 2;
 }
 // For updating the status of an order
 message UpdateOrderStatusRequest {
