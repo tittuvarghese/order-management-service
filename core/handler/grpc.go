@@ -160,6 +160,7 @@ func (s *Server) GetOrder(ctx context.Context, req *proto.GetOrderRequest) (*pro
 	// Iterate through orders and build the response
 	response := &proto.Order{
 		OrderId: order.OrderID,
+		Status:  string(order.Status),
 		Items:   GetItemsFromOrder(order.Items), // Get items from order
 		Address: &proto.Address{
 			AddressLine1: order.Address.AddressLine1,
@@ -196,4 +197,47 @@ func GetItemsFromOrder(order []models.Item) []*proto.OrderItem {
 
 	// Return the slice directly
 	return items
+}
+
+func (s *Server) UpdateOrderStatus(ctx context.Context, req *proto.UpdateOrderStatusRequest) (*proto.UpdateOrderStatusResponse, error) {
+	// Parse the customer ID
+	buyerId, err := uuid.Parse(req.CustomerId)
+	if err != nil {
+		return &proto.UpdateOrderStatusResponse{
+			Message: "Unable to parse buyer id",
+		}, err
+	}
+
+	fmt.Println(buyerId)
+	fmt.Println(req.OrderId)
+	fmt.Println(req.Status)
+
+	// Get the orders for the customer
+	orderResult, err := service.GetOrder(buyerId, req.OrderId, s.RdbInstance)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(orderResult) <= 0 {
+		log.Error("no order found", nil)
+		return &proto.UpdateOrderStatusResponse{
+			Message: "No order found",
+		}, fmt.Errorf("no order found")
+	}
+
+	order := orderResult[0]
+
+	if order.Status != models.OrderStatus(req.Status) {
+		order.Status = models.OrderStatus(req.Status)
+	}
+
+	err = service.UpdateOrder(order, s.RdbInstance)
+	if err != nil {
+		return &proto.UpdateOrderStatusResponse{
+			Message: "Failed to update the order status. error: " + err.Error(),
+		}, err
+	}
+
+	// Return the created product
+	return &proto.UpdateOrderStatusResponse{Message: "Successfully updated the order status"}, nil
 }

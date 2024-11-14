@@ -91,3 +91,10 @@ func GetOrder(customerId uuid.UUID, orderId string, storage *database.Relational
 
 	return *foundOrder, nil
 }
+func UpdateOrder(order models.Order, storage *database.RelationalDatabase) error {
+	err := storage.Instance.Update(&order)
+	if err != nil {
+		return err
+	}
+	return nil
+}

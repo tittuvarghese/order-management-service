@@ -24,7 +24,7 @@ message Order {
   string customer_id = 2;
   repeated OrderItem items = 3;
   double total_price = 4;
-  OrderStatus status = 5;
+  string status = 5;
   Address Address = 6;
   string Phone = 7;
 }
@@ -69,31 +69,26 @@ message GetOrderResponse {
 // For updating the status of an order
 message UpdateOrderStatusRequest {
   string order_id = 1;
-  OrderStatus status = 2;
+  string customer_id = 2;
+  string status = 3;
 }
 message UpdateOrderStatusResponse {
-  Order order = 1;
+  string Message = 1;
 }
 // For canceling an order
-message CancelOrderRequest {
-  string order_id = 1;
-}
-message CancelOrderResponse {
-  Order order = 1;
-}
-// For returning an order
-message ReturnOrderRequest {
-  string order_id = 1;
-}
-message ReturnOrderResponse {
-  Order order = 1;
-}
+//message CancelOrderRequest {
+//  string customer_id = 1;
+//  string order_id = 2;
+//}
+//message CancelOrderResponse {
+//  string Message = 1;
+//}
+
 // gRPC service definition
 service OrderService {
   rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse);
   rpc GetOrders(GetOrdersRequest) returns (GetOrdersResponse);
   rpc GetOrder(GetOrderRequest) returns (GetOrderResponse);
   rpc UpdateOrderStatus(UpdateOrderStatusRequest) returns (UpdateOrderStatusResponse);
-  rpc CancelOrder(CancelOrderRequest) returns (CancelOrderResponse);
-  rpc ReturnOrder(ReturnOrderRequest) returns (ReturnOrderResponse);
+//  rpc CancelOrder(CancelOrderRequest) returns (CancelOrderResponse);
 }

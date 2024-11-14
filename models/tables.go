@@ -36,7 +36,7 @@ type Order struct {
 	Address    Address     `gorm:"foreignKey:OrderID" json:"address"`
 	TotalPrice float64     `gorm:"type:decimal(10,2);not null" json:"total_price"`
 	Phone      string      `json:"phone"`
-	Status     OrderStatus `gorm:"type:varchar(20);default:Pending;not null" json:"status"`
+	Status     OrderStatus `gorm:"type:varchar(20);default:PENDING;not null" json:"status"`
 	CreatedAt  time.Time   `gorm:"autoCreateTime" json:"created_at"`
 	UpdatedAt  time.Time   `gorm:"autoUpdateTime" json:"updated_at"`
 }
