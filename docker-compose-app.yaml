@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  order-management-service:
+    container_name: order-management-service
+    image: tittuvarghese/scalableservice:latest
+    command:
+      - "./order-management-service"
+    environment:
+      - DATABASE_URL=ecommerceuser:password@tcp(mariadb:3306)/ecommerce?charset=utf8mb4&parseTime=True&loc=Local
+    ports:
+      - "8084:8084"
