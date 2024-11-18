@@ -1,12 +1,12 @@
 package main
 
 import (
-	"github.com/tittuvarghese/core/config"
-	"github.com/tittuvarghese/core/logger"
-	"github.com/tittuvarghese/order-management-service/constants"
-	"github.com/tittuvarghese/order-management-service/core/database"
-	"github.com/tittuvarghese/order-management-service/core/handler"
-	"github.com/tittuvarghese/order-management-service/models"
+	"github.com/tittuvarghese/ss-go-core/config"
+	"github.com/tittuvarghese/ss-go-core/logger"
+	"github.com/tittuvarghese/ss-go-order-management-service/constants"
+	"github.com/tittuvarghese/ss-go-order-management-service/core/database"
+	"github.com/tittuvarghese/ss-go-order-management-service/core/handler"
+	"github.com/tittuvarghese/ss-go-order-management-service/models"
 )
 
 func main() {
@@ -16,6 +16,13 @@ func main() {
 	// Config Management
 	configManager := config.NewConfigManager(config.DEFAULT_CONFIG_PATH)
 	configManager.Enable()
+
+	if configManager.GetBool(constants.OtelEnableEnv) {
+		serviceName := configManager.GetString(constants.OtelServiceNameEnv)
+		collectorUrl := configManager.GetString(constants.OtelCollectorEnv)
+		insecureMode := configManager.GetBool(constants.OtelInsecureModeEnv)
+		otel.NewTraceProvider(serviceName, collectorUrl, insecureMode)
+	}
 
 	// DB Handling
 	dbConn := configManager.GetString(constants.DatabaseUrlEnvName)

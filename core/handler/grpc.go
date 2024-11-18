@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/uuid"
-	"github.com/tittuvarghese/core/logger"
-	"github.com/tittuvarghese/order-management-service/core/database"
-	"github.com/tittuvarghese/order-management-service/models"
-	"github.com/tittuvarghese/order-management-service/proto"
-	"github.com/tittuvarghese/order-management-service/service"
+	"github.com/tittuvarghese/ss-go-core/logger"
+	"github.com/tittuvarghese/ss-go-order-management-service/core/database"
+	"github.com/tittuvarghese/ss-go-order-management-service/models"
+	"github.com/tittuvarghese/ss-go-order-management-service/proto"
+	"github.com/tittuvarghese/ss-go-order-management-service/service"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"net"
@@ -23,7 +23,7 @@ type Server struct {
 var log = logger.NewLogger("order-management-service")
 
 func NewGrpcServer() *Server {
-	return &Server{GrpcServer: grpc.NewServer()}
+	return &Server{GrpcServer: grpc.NewServer(grpc.StatsHandler(otelgrpc.NewServerHandler()))}
 }
 
 func (s *Server) Run(port string) {

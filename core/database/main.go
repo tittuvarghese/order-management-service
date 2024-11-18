@@ -1,6 +1,6 @@
 package database
 
-import "github.com/tittuvarghese/core/storage"
+import "github.com/tittuvarghese/ss-go-core/storage"
 
 type RelationalDatabase struct {
 	Instance *storage.RelationalDB
