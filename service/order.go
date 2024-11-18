@@ -3,8 +3,8 @@ package service
 import (
 	"fmt"
 	"github.com/google/uuid"
-	"github.com/tittuvarghese/order-management-service/core/database"
-	"github.com/tittuvarghese/order-management-service/models"
+	"github.com/tittuvarghese/ss-go-order-management-service/core/database"
+	"github.com/tittuvarghese/ss-go-order-management-service/models"
 )
 
 func CreateOrder(order models.Order, storage *database.RelationalDatabase) error {
